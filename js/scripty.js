@@ -13,12 +13,11 @@
            });           
         });
   });
-  
-  
+    
   function SaveEvent(obj, user_data) {
     //increment event count
-    if (user_data.eventObjects &&  _.find(user_data.eventObjects, {objId: obj.id})) {
-      _.find(user_data.eventObjects, {objId: obj.id}).eventCount += 1;  
+    if (user_data.eventObjects &&  find(user_data.eventObjects, function(e){ return e.objId == obj.id})) {
+      find(user_data.eventObjects, function(e){ return e.objId == obj.id}).eventCount += 1;  
     }
     else {
       if (!user_data.eventObjects){
@@ -35,14 +34,14 @@
   }  
   
   function CheckDependentObjects(obj, user_data) {
-     var depOf =_.filter(eventObjectData, function(d) { return d.dependentObj;});
+     var depOf = filter(eventObjectData, function(d) { return d.dependentObj;});
      
      //check evenet threshold of all dependent
-     _.each(depOf, function(dep){
+     $.each(depOf, function(index,dep){
         var show = true;
-        _.each(dep.dependentObj, function(d){
-          var eod = _.find(eventObjectData, function(e) { return e.objId === d });
-          var uObj = _.find(user_data.eventObjects, function(e){ return e.objId === d});
+        $.each(dep.dependentObj, function(index,d){
+          var eod = find(eventObjectData, function(e) { return e.objId === d });
+          var uObj = find(user_data.eventObjects, function(e){ return e.objId === d});
           if (!uObj || uObj.eventCount < eod.threshold)
               show = false;
         });
@@ -52,5 +51,30 @@
      })
      
       
+  }
+    
+  //utillity functions to replace underscore dependency
+  function find(collection, predicate){
+      if (!collection) return null;
+      
+      var ret = null;
+      collection.forEach(function(element) {
+        if (!ret && predicate(element)) {
+          ret = element;
+        }
+      });
+      return ret;
+  }
+  
+  function filter(collection, predicate){
+      if (!collection) return [];
+
+      var ret = [];
+      $.each(collection, function(index, obj){
+        if (predicate(obj)) {
+          ret.push(obj);
+        }
+      })  
+      return ret;
   }
 
